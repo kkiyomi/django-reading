@@ -1,0 +1,47 @@
+[data-theme="dark"] {
+    background-color: #000000 !important;
+    color: #666;
+}
+
+[data-theme="dark"] .page-item-detail {
+    background-color: #000015 !important;
+}
+
+[data-theme="dark"] .card-header {
+    background-color: #001A38 !important;
+}
+
+[data-theme="dark"] .novel-detail {
+    background-color: #0d1016 !important;
+    color: #d6d6d6;
+}
+
+[data-theme="dark"] .novel-search {
+    background-color: #333333 !important;
+    color: #d6d6d6;
+}
+
+[data-theme="dark"] .chapter-detail {
+    background-color: #0d1016 !important;
+    color: #c6c6c6;
+}
+
+
+[data-theme="dark"] .pagination a {
+    color: #fff;
+
+}
+
+[data-theme="dark"] .pagination a:hover,
+.pagination a {
+    color: #2c3e50;
+}
+
+[data-theme="dark"] .pagination a:before {
+    background-color: #fff;
+
+}
+
+[data-theme="dark"] .pagination .pagination-active {
+    color: #2c3e50;
+}

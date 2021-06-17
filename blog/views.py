@@ -88,14 +88,14 @@ class NovelReadingListView(ListView):
 class NovelHomeListView(ListView):
     model = Novel
     template_name = "blog/home.html"
-    paginate_by = 5 * 6
+    paginate_by = 5 * 2
     paginate_orphans = 4
 
     def get_queryset(self):
-        ch_novels = (
+        ch_novels = list(
             ChapterQUepubs.objects.distinct("novel_title")
             .extra(select={"myinteger": "CAST(number AS INTEGER)"})
-            .order_by("novel_title", "-myinteger")
+            .order_by("novel_title", "-myinteger")[:1000]
         )
         novel_titles = [
             item.novel_title for item in ch_novels if item.novel is not None
@@ -225,6 +225,8 @@ def get_from_epub(chapter):
         '<p><a epub:type="noteref" href="#n1"></a></p>': "",
         '<p><a epub:type="noteref" href="#n2"></a></p>': "",
         '<p><a epub:type="noteref" href="#n3"></a></p>': "",
+        '<p><a epub:type="noteref" href="#n4"></a></p>': "",
+        '<p><a epub:type="noteref" href="#n5"></a></p>': "",
         "\n": "",
     }
 

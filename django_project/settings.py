@@ -22,6 +22,9 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0", "192.168.1.102"]
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -36,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     "rest_framework",
     "corsheaders",
+    "debug_toolbar",
 ]
 
 
@@ -56,6 +60,7 @@ AUTHENTICATION_BACKENDS = [
 # }
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

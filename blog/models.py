@@ -130,6 +130,8 @@ class ChapterV2(models.Model):
     novel = models.ForeignKey(Novel, on_delete=models.CASCADE)
     date_posted = models.DateTimeField(default=timezone.now)
 
+    in_other = models.CharField(max_length=100, default="default")
+
     def save(self, *args, **kwargs):
         root = "C:\\Users\\user\\Desktop\\python\\django_project\\media"
         path = f"\\novel_pics\\{slugify(self.novel.title)}.png"
@@ -159,13 +161,13 @@ class ChapterQUepubs(models.Model):
     )
 
     def save(self, *args, **kwargs):
+        if self.novel_title == "default" and self.novel is not None:
+            self.novel_title = self.novel.dir_name
+
         if self.novel_qu is None:
             self.novel_qu, _ = NovelQu.objects.get_or_create(
                 novel_title=self.novel_title
             )
-
-        if self.novel_title == "default" and self.novel is not None:
-            self.novel_title = self.novel.title
 
         super(ChapterQUepubs, self).save(*args, **kwargs)
 

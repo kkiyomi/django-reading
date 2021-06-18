@@ -28,7 +28,6 @@ INTERNAL_IPS = [
 # Application definition
 
 INSTALLED_APPS = [
-    "para",
     "blog.apps.BlogConfig",
     "django.contrib.admin",
     "django.contrib.auth",

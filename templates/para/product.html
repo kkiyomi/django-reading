@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row row-cols">
+        <div class="card mb-3 page-item-detail border-0">
+            <div class="row no-gutters">
+                <div class="col-md-4">
+                    <a href="{% url 'product_detail' product.slug %}" title="{{product.name}}">
+                        <img class="rounded float-left embed-responsive" src="{{ product.image.url }}" alt="{{product.name}}">
+                    </a>
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title display-4 text-decoration-none">
+                            <p>{{ product.name|title }}</p>
+                        </h5>
+                        <p class="card-text">
+                            <p>Prix : {{ product.price }}</p>
+                            <p>Stock : {{ product.stock }}</p>
+                            <p>Date added : {{ product.date_posted|naturaltime }}</p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

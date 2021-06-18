@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<div class="container h-100">
+    <div class="d-flex justify-content-center h-100">
+        <form class="searchbar" metod="GET" action="{% url 'novel_search' %}">
+            <input class="search_input" type="text" name="s" placeholder="Search...">
+            <button class="btn text-nowrap search_icon" type="submit"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
+</div>
+<div>
+    <h4 class="mb-5">Search Results for "{{ request.GET.s }}"</h4>
+</div>
+{% if novels %}
+{% for novel in page_obj %}
+<div class="card mb-3 h-100 novel-detail">
+    <div class="row no-gutters">
+        <div class="col-auto">
+            <a href="{% url 'novel_detail' novel.slug %}" title="{{novel.title}}">
+                <img src="{{ novel.image.url }}" class="rounded float-left" style="max-width:190px;">
+            </a>
+        </div>
+        <div class="col ">
+            <div class="card-body ">
+                <a href="{% url 'novel_detail' novel.slug %}">
+                    <h5 class="card-title display-4" style="font-size: 2em">{{ novel.title }}</h5>
+                </a>
+                <div class="mb-4">
+                    {% for genre in novel.genres.all %}
+                    <span class="badge badge-secondary"><a class="text-decoration-none genre-link" href="/genre/{{ genre.slug }}">{{ genre.name }}</a></span>
+                    {% endfor %}
+                </div>
+                <div class="mb-4 d-flex justify-content-between">
+                    <div>
+                        <h5>Author(s)</h5>
+                        <p class="card-text"> {{ novel.author }} </p>
+                    </div>
+                    <div>
+                        <h5>Type</h5>
+                        <p class="card-text"> {{ novel.language }} </p>
+                    </div>
+                    <div>
+                        <h5>Year</h5>
+                        <p class="card-text"> {{ novel.year }} </p>
+                    </div>
+                    <div>
+                        <h5>Status</h5>
+                        <p class="card-text"> {{ novel.status }} </p>
+                    </div>
+                    <div>
+                        <h5>Views</h5>
+                        <p class="card-text"> {{ novel.views }} </p>
+                    </div>
+                </div>
+                <p>
+                    <a class="mr-2 btn btn-primary novel-search" data-toggle="collapse" href="#collapseDescription-{{ novel.slug }}" role="button" aria-expanded="false" aria-controls="collapseDescription-{{ novel.slug }}">
+                        Description
+                    </a>
+                    {% for chapter in novel.chapterv2_set.all|dictsortreversed:"id"|slice:"1" %}
+                    <span>Latest update <a href="{% url 'novel_chapter' novel.slug chapter.number %}">{{ chapter.title }}</a></span>
+                    <small class="text-muted"> {{ chapter.date_posted|naturaltime }}</small>
+                    {% endfor %}
+                </p>
+                <div class="collapse" id="collapseDescription-{{ novel.slug }}">
+                    <div class="card card-body novel-search">
+                        <p> {{ novel.description|linebreaksbr }} </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<nav class="pagination-container">
+    <div class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <a class="pagination-newer" href="?page=1&s={{ request.GET.s }}">First</a>
+        <a class="pagination-newer" href="?page={{ page_obj.previous_page_number }}&s={{ request.GET.s }}">Previous</a>
+        {% else %}
+        <a class="pagination-newer" href="#" tabindex="-1">Previous</a>
+        {% endif %}
+        <span class="pagination-inner">
+            {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+            <a class="pagination-active" href="#">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</a>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a href="?page={{ num }}&s={{ request.GET.s }}">{{ num }}</a>
+                {% endif %}
+                {% endfor %}
+        </span>
+        {% if page_obj.has_next %}
+        <a class="pagination-older" href="?page={{ page_obj.next_page_number }}&s={{ request.GET.s }}">Next</a>
+        <a class="pagination-older" href="?page={{ page_obj.paginator.num_pages }}&s={{ request.GET.s }}">Last</a>
+        {% else %}
+        <a class="pagination-older" href="#" tabindex="-1">Next</a>
+        {% endif %}
+    </div>
+</nav>
+{% else %}
+Nothing found. Search again...
+{% endif %}
+{% endblock %}

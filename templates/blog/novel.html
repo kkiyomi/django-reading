@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load filter_extras %}
+{% block content %}
+
+<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type='text/javascript'>
+    $( document ).ready(function() {
+        $('.nav-link').on('click', function () {
+            var href = $(this).attr('href');
+            $('#nav-tab a.nav-link[href="' + href + '"]').tab('show');
+        })
+    });
+</script>
+
+<div class="card mb-3 h-100 novel-detail">
+    <div class="row no-gutters">
+        <div class="col-auto">
+            <img src="{{ object.image.url }}" class="rounded float-left" style="max-height:300px;">
+        </div>
+        <div class="col ">
+            <div class="card-body h-100 d-flex flex-column align-content-around flex-wrap">
+                <h5 class="card-title display-4" style="font-size: 2em">
+                    <a target="_blank" href="https://www.webnovel.com/book/{{object.wid}}"> {{ object.title }}</a>
+                </h5>
+                <div class="my-auto">
+                    {% for genre in object.genres.all %}
+                    <span class="badge badge-secondary"><a class="text-decoration-none genre-link" href="/genre/{{ genre.slug }}">{{ genre.name }}</a></span>
+                    {% endfor %}
+                </div>
+                <strong></strong>
+                <div class="my-auto d-flex justify-content-between">
+                    <div>
+                        <h5>Author(s)</h5>
+                        <p class="card-text"> {{ object.author }} </p>
+                    </div>
+                    <div>
+                        <h5>Id</h5>
+                        <p class="card-text"> {{ object.wid }} </p>
+                    </div>
+                    <div>
+                        <h5>Year</h5>
+                        <p class="card-text"> {{ object.year }} </p>
+                    </div>
+                    <div>
+                        <h5>Status</h5>
+                        <p class="card-text"> {{ object.status }} </p>
+                    </div>
+                    <div>
+                        <h5>Views</h5>
+                        <p class="card-text"> {{ object.views }} </p>
+                    </div>
+                </div>
+                <div class="card-text mt-auto">
+                    {% for chapter in object.chapter_set.all|dictsortreversed:"id"|slice:"1" %}
+                    <span>Latest update <a href="{{ chapter.number }}">Chapter {{ chapter.number }}: {{ chapter.title }}</a></span>
+                    <small class="text-muted"> {{ chapter.date_posted|naturaltime }}</small>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="accordion mb-3">
+    <div class="card novel-detail">
+        <div class="card-header" id="headingOne">
+            <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-left text-decoration-none font-weight-bold" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Description</button>
+            </h2>
+        </div>
+        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
+            <div class="card-body">
+                <p> {{ object.description|linebreaksbr }} </p>
+            </div>
+        </div>
+    </div>
+    <div class="card novel-detail">
+        <div class="card-header" id="headingTwo">
+            <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-left collapsed text-decoration-none font-weight-bold" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Latest Release</button>
+            </h2>
+        </div>
+        <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo">
+            <nav class="nav nav-tabs justify-content-center">
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                {% for slice in querysets|qst_mix|ch_sliced %}
+                {% if slice == querysets|qst_mix|ch_sliced|first %}
+                    <a class="nav-link active" id="nav-{{ slice.0.0 }}-tab" data-toggle="tab" href="#nav-{{ slice.0.0 }}" role="tab" aria-controls="nav-{{ slice.0.0 }}" aria-selected="true">
+                    {{ slice.0.1.number }} - {{ slice.0.2.number }}</a>
+                {% else %}
+                    <a class="nav-link" id="nav-{{ slice.0.0 }}-tab" data-toggle="tab" href="#nav-{{ slice.0.0 }}" role="tab" aria-controls="nav-{{ slice.0.0 }}" aria-selected="false">
+                    {{ slice.0.1.number }} - {{ slice.0.2.number }}</a>
+                {% endif %}
+                {% endfor %}
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                {% for slice in querysets|qst_mix|ch_sliced %}
+                {% if slice == querysets|qst_mix|ch_sliced|first %}
+                <div class="tab-pane fade show active" id="nav-{{ slice.0.0 }}" role="tabpanel" aria-labelledby="nav-{{ slice.0.0 }}-tab">
+                    <div class="card-body">
+                        {% for chapter in slice.1 %}
+                        {% if chapter %}
+                        <div class="mb-2 d-flex justify-content-between">
+                            {% if 'Chapter' in chapter.title %}
+                                <a href="{{ chapter.number }}">{{ chapter.title }}</a>
+                                {% else %}
+                                <a href="{{ chapter.number }}">Chapter {{ chapter.number }} - {{ chapter.title }}</a>
+                            {% endif %}
+                            {% if chapter.date_posted|time_difference:"48" %}
+                            <small class="text-muted"> {{ chapter.date_posted|naturaltime }}</small>
+                            {% else %}
+                            <small class="text-muted"> {{ chapter.date_posted|date:"n/j/Y" }}</small>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="tab-pane fade" id="nav-{{ slice.0.0 }}" role="tabpanel" aria-labelledby="nav-{{ slice.0.0 }}-tab">
+                    <div class="card-body">
+                        {% for chapter in slice.1 %}
+                        {% if chapter %}
+                        <div class="mb-2 d-flex justify-content-between">
+                            <a href="{{ chapter.number }}">Chapter {{ chapter.number }} - {{ chapter.title }}</a>
+                            {% if chapter.date_posted|time_difference:"48" %}
+                            <small class="text-muted"> {{ chapter.date_posted|naturaltime }}</small>
+                            {% else %}
+                            <small class="text-muted"> {{ chapter.date_posted|date:"n/j/Y" }}</small>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <nav class="nav nav-tabs justify-content-center">
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                {% for slice in querysets|qst_mix|ch_sliced %}
+                {% if slice == querysets|qst_mix|ch_sliced|first %}
+                    <a class="nav-link active" id="nav-{{ slice.0.0 }}-tab" data-toggle="tab" href="#nav-{{ slice.0.0 }}" role="tab" aria-controls="nav-{{ slice.0.0 }}" aria-selected="true">
+                    {{ slice.0.1.number }} - {{ slice.0.2.number }}</a>
+                {% else %}
+                    <a class="nav-link" id="nav-{{ slice.0.0 }}-tab" data-toggle="tab" href="#nav-{{ slice.0.0 }}" role="tab" aria-controls="nav-{{ slice.0.0 }}" aria-selected="false">
+                    {{ slice.0.1.number }} - {{ slice.0.2.number }}</a>
+                {% endif %}
+                {% endfor %}
+                </div>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}

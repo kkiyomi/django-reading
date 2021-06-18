@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'manga/pricing.css' %}">
+{% endblock css %}
+
+{% block content %}
+
+<div class="snip1214">
+  <div class="plan">
+    <h3 class="plan-title">
+      Tier 1
+    </h3>
+    <div class="plan-cost"><span class="plan-price">59</span><span class="plan-type">DH/ Mois</span></div>
+    <ul class="plan-features">
+      <li><i class="ion-checkmark"> </i>Jusqu'à 30% de remise</li>
+      <li><i class="ion-checkmark"> </i>Jusqu'à 4 produit par mois</li>
+      <li><i class="ion-checkmark"> </i>Invitez 3 amis pour recevoir un mois gratuit de plus</li>
+    </ul>
+    <div class="plan-select"><a href="">Select Plan</a></div>
+  </div>
+  <div class="plan featured">
+    <h3 class="plan-title">
+      Tier 2
+    </h3>
+    <div class="plan-cost"><span class="plan-price">200</span><span class="plan-type">DH/ Mois</span></div>
+    <ul class="plan-features">
+      <li><i class="ion-checkmark"> </i>Jusqu'à 30% de remise</li>
+      <li><i class="ion-checkmark"> </i>Jusqu'à 10 produit par mois</li>
+      <li><i class="ion-checkmark"> </i>Invitez 2 amis pour recevoir un mois gratuit de plus</li>
+    </ul>
+    <div class="plan-select"><a href="">Select Plan</a></div>
+  </div>
+  <div class="plan">
+    <h3 class="plan-title">
+      Tier 3
+    </h3>
+    <div class="plan-cost"><span class="plan-price">500</span><span class="plan-type">DH/ Mois</span></div>
+    <ul class="plan-features">
+      <li><i class="ion-checkmark"> </i>Jusqu'à 30% de remise</li>
+      <li><i class="ion-checkmark"> </i>Jusqu'à 100 produit par mois</li>
+      <li><i class="ion-checkmark"> </i>Invitez 1 amis pour recevoir un mois gratuit de plus</li>
+    </ul>
+    <div class="plan-select"><a href="">Select Plan</a></div>
+  </div>
+</div>
+
+{% endblock content %}

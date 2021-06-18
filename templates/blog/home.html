@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load filter_extras %}
+
+{% block content %}
+<div class="row">
+    <div class="container my-2">
+        {% if subtitle %}
+        <h4 class="display-4" style="font-size: 2.5em">{{ subtitle }} novels</h4>
+        {% else %}
+        <h4 class="display-4" style="font-size: 2.5em">LATEST NOVEL UPDATES</h4>
+        {% endif %}
+    </div>
+    <div class="row row-cols-7 justify-content-center mx-0">
+        {% for novel in page_obj %}
+        {% if novel %}
+        <div class="card mb-3 m-2 page-item-detail text-center"
+            style="min-width: 200px !important;max-width: 210px !important;">
+            <a href="/novel/{{novel.slug}}" title="{{novel.title}}">
+                <img class="rounded float-left embed-responsive" src="{{ novel.image.url }}" alt="{{novel.title}}">
+            </a>
+            <div class="card-body pb-0">
+                <h6 class="card-title"><a href="{% url 'novel_detail' novel.slug %}">{{ novel.title|title }}</a></h6>
+            </div>
+            <div class="card-body pt-0 d-flex align-items-end">
+                <div class="card-body p-0">
+                    {% for chapter in chapters_model|get_chapters_from_id:novel.id|ordereddesc|slice:"2" %}
+                    <div class="row justify-content-between chapter-display">
+                        <a class="text-muted" href="{% url 'novel_chapter' novel.slug chapter.number %}"
+                            style="font-size: 0.95em">Chapter {{ chapter.number }}</a>
+                        <p class="text-muted my-0" style="font-size: 0.8em">
+                            {{chapter.date_posted|naturaltime|shorten_naturaltime }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <nav class="pagination-container">
+        <div class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <a class="pagination-newer" href="?page=1">First</a>
+            <a class="pagination-newer" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% else %}
+            <a class="pagination-newer" href="#" tabindex="-1">Previous</a>
+            {% endif %}
+            <span class="pagination-inner">
+                {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                <a class="pagination-active" href="#">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages
+                    }}</a>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a href="?page={{ num }}">{{
+                    num }}</a>
+                    {% endif %}
+                    {% endfor %}
+            </span>
+            {% if page_obj.has_next %}
+            <a class="pagination-older" href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a class="pagination-older" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+            {% else %}
+            <a class="pagination-older" href="#" tabindex="-1">Next</a>
+            {% endif %}
+        </div>
+    </nav>
+</div>
+
+{% endblock content %}

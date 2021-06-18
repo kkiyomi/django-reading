@@ -77,16 +77,19 @@ class Novel(models.Model):
         if self.slug == "":
             # Newly created object, so set slug
             self.slug = slugify(self.title)
-        if self.dir_name == "":
+        redict = {
+            " ": "_",
+            "'": "",
+            ":": "",
+            ",": "",
+            "?": "",
+            "!": "",
+        }
+        if (
+            self.dir_name == ""
+            or set(redict.keys()).intersection(set(self.dir_name)) != set()
+        ):
             self.dir_name = self.title
-            redict = {
-                " ": "_",
-                "'": "",
-                ":": "",
-                ",": "",
-                "?": "",
-                "!": "",
-            }
             for key, value in redict.items():
                 self.dir_name = self.dir_name.replace(key, value)
 

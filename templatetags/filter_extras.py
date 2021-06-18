@@ -2,6 +2,7 @@ from django import template
 from django.utils import timezone
 from datetime import timedelta
 from itertools import zip_longest
+
 register = template.Library()
 
 
@@ -28,9 +29,9 @@ def get_prev_next(value, qset, cond):
     except IndexError:
         next_ch = None
 
-    if cond == 'prev_ch':
+    if cond == "prev_ch":
         return prev_ch
-    if cond == 'next_ch':
+    if cond == "next_ch":
         return next_ch
 
 
@@ -46,12 +47,18 @@ def qst_mix(value):
     dict_nb_v2 = dict(numbers_v2)
 
     if len(queryset_qu) == 0:
-        ch_nb_max, ch_nb_min = int(queryset_v2[0].number), int(queryset_v2[::-1][0].number)
+        ch_nb_max, ch_nb_min = int(queryset_v2[0].number), int(
+            queryset_v2[::-1][0].number
+        )
     elif len(queryset_v2) == 0:
-        ch_nb_max, ch_nb_min = int(queryset_qu[0].number), int(queryset_qu[::-1][0].number)
+        ch_nb_max, ch_nb_min = int(queryset_qu[0].number), int(
+            queryset_qu[::-1][0].number
+        )
     else:
         ch_nb_max = max(int(queryset_qu[0].number), int(queryset_v2[0].number))
-        ch_nb_min = min(int(queryset_qu[::-1][0].number), int(queryset_v2[::-1][0].number))
+        ch_nb_min = min(
+            int(queryset_qu[::-1][0].number), int(queryset_v2[::-1][0].number)
+        )
 
     new_queryset = []
     for index, ch_nb in enumerate(range(ch_nb_min, ch_nb_max + 1)):
@@ -82,7 +89,11 @@ def ch_sliced(value):
 @register.filter
 def chapters_ordereddesc(value):
     """Removes all values of arg from the given string"""
-    return value.chapter_set.all().extra(select={'myinteger': "CAST(number AS INTEGER)"}).order_by('-myinteger')
+    return (
+        value.chapter_set.all()
+        .extra(select={"myinteger": "CAST(number AS INTEGER)"})
+        .order_by("-myinteger")
+    )
 
 
 @register.filter
@@ -92,16 +103,26 @@ def get_chapters(value, novel_title):
 
 
 @register.filter
+def get_chapters_from_id(value, novel_id):
+    queryset = value.filter(novel=novel_id)
+    return queryset
+
+
+@register.filter
 def ordereddesc(value):
     """Removes all values of arg from the given string"""
-    return value.all().extra(select={'myinteger': "CAST(number AS INTEGER)"}).order_by('-myinteger')
+    return (
+        value.all()
+        .extra(select={"myinteger": "CAST(number AS INTEGER)"})
+        .order_by("-myinteger")
+    )
 
 
 @register.filter
 def shorten_naturaltime(value):
-    if ',' in value:
-        naturaltime = value.split(',')[0]
-        return f'{naturaltime} ago'
+    if "," in value:
+        naturaltime = value.split(",")[0]
+        return f"{naturaltime} ago"
     else:
         return value
 
@@ -110,7 +131,7 @@ def shorten_naturaltime(value):
 def time_difference(value, hours):
     test = timezone.now() - value
     test = str(test - timedelta(hours=int(hours)))
-    if '-' in test:
+    if "-" in test:
         return True
     else:
         return False

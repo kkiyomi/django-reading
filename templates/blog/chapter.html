@@ -7,12 +7,12 @@
 {% block css %}
 <link rel="stylesheet" type="text/css" href="{% static 'blog/scroll_top.css' %}">
 {% endblock %}
-current_chapter
+
 
 {% block content %}
 
-{% get_prev_next chapter querysets|qst_mix "prev_ch" as prev_ch %}
-{% get_prev_next chapter querysets|qst_mix "next_ch" as next_ch %}
+{% get_prev_next chapter querysets "prev_ch" as prev_ch %}
+{% get_prev_next chapter querysets "next_ch" as next_ch %}
 
 <div class="container">
     <ul class="nav nav-tabs justify-content-center mb-4 nav-fill">
@@ -20,9 +20,10 @@ current_chapter
             <a class="nav-link active" href="{% url 'novel_detail' novel.slug %}"> {{ novel.title }}</a>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Chapters</a>
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                aria-expanded="false">Chapters</a>
             <div class="chapters-dropdown dropdown-menu">
-                {% for chapt in querysets|qst_mix %}
+                {% for chapt in querysets %}
                 {% if chapter.number == chapt.number %}
                 <a class="dropdown-item active" href="{{ chapt.number }}">{{ chapt.title }}</a>
                 {% else %}
@@ -59,9 +60,10 @@ current_chapter
             <a class="nav-link" href="{% url 'novel_detail' novel.slug %}"> {{ novel.title }}</a>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Chapters</a>
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                aria-expanded="false">Chapters</a>
             <div class="chapters-dropdown dropdown-menu">
-                {% for chapter in querysets|qst_mix %}
+                {% for chapter in querysets %}
                 <a class="dropdown-item" href="{{ chapter.number }}">{{ chapter.title }}</a>
                 {% endfor %}
             </div>

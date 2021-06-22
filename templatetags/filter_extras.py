@@ -46,13 +46,13 @@ def qst_mix(value):
     dict_nb_qu = dict(numbers_qu)
     dict_nb_v2 = dict(numbers_v2)
 
-    if len(queryset_qu) == 0:
-        ch_nb_max, ch_nb_min = int(queryset_v2[0].number), int(
-            queryset_v2[::-1][0].number
-        )
-    elif len(queryset_v2) == 0:
+    if len(queryset_v2) == 0:
         ch_nb_max, ch_nb_min = int(queryset_qu[0].number), int(
             queryset_qu[::-1][0].number
+        )
+    elif len(queryset_qu) == 0:
+        ch_nb_max, ch_nb_min = int(queryset_v2[0].number), int(
+            queryset_v2[::-1][0].number
         )
     else:
         ch_nb_max = max(int(queryset_qu[0].number), int(queryset_v2[0].number))

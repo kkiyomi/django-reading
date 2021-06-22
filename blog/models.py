@@ -84,6 +84,9 @@ class Novel(models.Model):
             ",": "",
             "?": "",
             "!": "",
+            "[": "",
+            "]": "",
+            "’": "",
         }
         if (
             self.dir_name == ""
@@ -106,6 +109,7 @@ class NovelQu(models.Model):
     novel = models.OneToOneField(
         Novel, on_delete=models.SET_NULL, blank=True, null=True
     )
+    date_posted = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
         try:
@@ -152,7 +156,7 @@ class ChapterQUepubs(models.Model):
     title = models.CharField(max_length=500, default="default")
     number = models.CharField(max_length=100)
     content_path = models.CharField(max_length=500, default="default")
-    folder = models.CharField(max_length=500, default="novel_quepubs")
+    folder = models.CharField(max_length=500, default="novel_quepub/")
     date_posted = models.DateTimeField(default=timezone.now)
 
     novel = models.ForeignKey(Novel, on_delete=models.SET_NULL, blank=True, null=True)

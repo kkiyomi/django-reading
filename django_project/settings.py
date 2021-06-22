@@ -20,11 +20,6 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0", "192.168.1.102"]
-
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
 # Application definition
 
 INSTALLED_APPS = [
@@ -103,21 +98,6 @@ WSGI_APPLICATION = "django_project.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-DATABASES = {
-    # 'default1': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # },
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "wuxianovel",
-        "USER": "postgres",
-        "PASSWORD": "11559900",
-        "HOST": "localhost",
-        "PORT": "5432",
-    }
-}
 
 
 # Password validation

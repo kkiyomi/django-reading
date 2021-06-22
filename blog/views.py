@@ -3,7 +3,7 @@ from django.db.models import Max, F, Count
 from django.views.generic import ListView
 from django.core.paginator import Paginator
 from django.views.generic.detail import DetailView
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.utils import timezone
 from django.db import transaction
 
@@ -48,9 +48,9 @@ class NovelNewListView(ListView):
 
     def get_queryset(self):
         return (
-            Novel.objects.filter(original="False")
-            .annotate(Max("chapterv2__date_posted"))
-            .order_by("-date_added")
+            Novel.objects.exclude(original="None")
+            .filter(original="False")
+            .order_by("-id")
         )
 
     def get_context_data(self, **kwargs):
@@ -73,14 +73,18 @@ class NovelReadingListView(ListView):
         from django.db.models import Case, When
 
         preserved = Case(*[When(title=pk, then=pos) for pos, pk in enumerate(novels)])
-        queryset = Novel.objects.filter(title__in=novels).order_by(preserved)
+        queryset = (
+            Novel.objects.exclude(original="None")
+            .filter(title__in=novels)
+            .order_by(preserved)
+        )
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["subtitle"] = "Reading list"
         context["page_title"] = "Reading list"
-        context["chapters_model"] = ChapterV2.objects
+        context["chapters_model"] = ChapterQUepubs.objects
         context["special"] = True
         return context
 
@@ -92,16 +96,8 @@ class NovelHomeListView(ListView):
     paginate_orphans = 4
 
     def get_queryset(self):
-        ch_novels = list(
-            ChapterQUepubs.objects.distinct("novel_title")
-            .extra(select={"myinteger": "CAST(number AS INTEGER)"})
-            .order_by("novel_title", "-myinteger")[:1000]
-        )
-        novel_titles = [
-            item.novel_title for item in ch_novels if item.novel is not None
-        ]
         queryset = (
-            Novel.objects.filter(dir_name__in=novel_titles)
+            Novel.objects.exclude(original="None")
             .annotate(Max("chapterquepubs__date_posted"))
             .order_by("-chapterquepubs__date_posted__max")
         )
@@ -116,29 +112,10 @@ class NovelHomeListView(ListView):
         return context
 
 
-class NovelHomeListView2(ListView):
-    model = Novel
-    template_name = "blog/home.html"
-    paginate_by = 15 * 2 * 2
-    paginate_orphans = 4
-
-    def get_queryset(self):
-        return Novel.objects.annotate(Max("chapterv2__date_posted")).order_by(
-            "-chapterv2__date_posted__max"
-        )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["today_date"] = timezone.now
-        context["chapters_model"] = ChapterV2.objects
-        context["special"] = True
-        return context
-
-
 class NovelReadingListView3(ListView):
     model = Novel
     template_name = "blog/home.html"
-    paginate_by = 15 * 2 * 2
+    paginate_by = 15 * 2
     paginate_orphans = 4
 
     def get_queryset(self):
@@ -149,7 +126,11 @@ class NovelReadingListView3(ListView):
         from django.db.models import Case, When
 
         preserved = Case(*[When(title=pk, then=pos) for pos, pk in enumerate(novels)])
-        queryset = Novel.objects.filter(title__in=novels).order_by(preserved)
+        queryset = (
+            Novel.objects.exclude(original="None")
+            .filter(title__in=novels)
+            .order_by(preserved)
+        )
 
         return queryset
 
@@ -167,15 +148,29 @@ class NovelDetailView(DetailView):
     def get_queryset(self):
         queryset = self.model.objects.all()
         slug = self.kwargs["slug"]
+
         try:
             queryset = queryset.filter(slug=slug)
-        except Exception as e:
+        except ObjectDoesNotExist:
             queryset = queryset.filter(uid=slug)
 
         if randint(0, 5) == 2:
             queryset.update(views=F("views") + 6)
 
         return queryset
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        slug = self.kwargs["slug"]
+
+        try:
+            obj = queryset.get(slug=slug)
+        except MultipleObjectsReturned:
+            for item in queryset.filter(slug=slug).filter(wid="None"):
+                item.delete()
+            obj = queryset.get(slug=slug)
+
+        return obj
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -299,40 +294,36 @@ def treat_text(chapter):
 
 
 class ChapterDetailView(DetailView):
-    model = Novel
+    model = ChapterQUepubs
     template_name = "blog/chapter.html"
+
+    def get_object(self):
+
+        slug = self.kwargs.get("slug")
+        chapter_number = self.kwargs.get("chapter_number")
+
+        if self.queryset is None:
+            queryset = self.get_queryset()
+
+        obj = queryset.get(novel__slug=slug, number=chapter_number)
+
+        return obj
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        slug, chapter_number = self.kwargs.get("slug"), self.kwargs.get(
-            "chapter_number"
-        )
 
-        context["novel"] = Novel.objects.get(slug=slug)
+        context["novel"] = context["object"].novel
 
-        try:
-            context["chapter"] = ChapterQUepubs.objects.get(
-                novel=context["novel"], number=chapter_number
-            )
-        except Exception:
-            context["chapter"] = ChapterV2.objects.get(
-                novel=context["novel"], number=chapter_number
-            )
+        context["chapter"] = context["object"]
 
         queryset_qu = (
-            context["object"]
-            .chapterquepubs_set.all()
-            .extra(select={"myinteger": "CAST(number AS INTEGER)"})
-            .order_by("-myinteger")
-        )
-        queryset_v2 = (
-            context["object"]
-            .chapterv2_set.all()
+            ChapterQUepubs.objects.filter(novel=context["object"].novel_id)
             .extra(select={"myinteger": "CAST(number AS INTEGER)"})
             .order_by("-myinteger")
         )
 
-        context["querysets"] = [queryset_qu, queryset_v2]
+        print(context)
+        context["querysets"] = queryset_qu
 
         context["content"] = treat_text(context["chapter"])
 
@@ -384,7 +375,9 @@ def search(request):
     query = request.GET.get("s")
     novels = ""
     if query:
-        novels = Novel.objects.filter(title__icontains=query.strip())
+        novels = Novel.objects.exclude(original="None").filter(
+            title__icontains=query.strip()
+        )
     paginator = Paginator(list(novels), 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)

@@ -1,6 +1,13 @@
 from django.contrib import admin
+from django.core.paginator import Paginator
 from django.utils.translation import gettext_lazy as _
 from .models import *
+
+
+class FixedCountPaginator(Paginator):
+    @property
+    def count(self):
+        return 1000
 
 
 class NovelLinkedListFilter(admin.SimpleListFilter):
@@ -39,6 +46,24 @@ class ChapterTitleListFilter(admin.SimpleListFilter):
             return queryset.filter(title="default")
 
 
+class ChapterQUepubsListFilter(admin.SimpleListFilter):
+    title = _("QU epubs chapter")
+
+    parameter_name = "QUepubs"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("true", _("QU epubs")),
+            ("false", _("Not QU epubs")),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == "true":
+            return queryset.filter(folder="novel_quepubs/")
+        if self.value() == "false":
+            return queryset.exclude(folder="novel_quepubs/")
+
+
 class SerieAdmin(admin.ModelAdmin):
     list_display = ("number", "novel", "date_posted")
     search_fields = (
@@ -53,24 +78,38 @@ class SerieAdmin(admin.ModelAdmin):
 
 
 class ChapterAdmin(admin.ModelAdmin):
-    list_display = ("number", "novel_title", "novel", "date_posted")
+    list_display = ("number", "novel", "date_posted")
     search_fields = (
         "novel_title",
         "number",
     )
     readonly_fields = ()
     list_per_page = 100
+    paginator = FixedCountPaginator
+    show_full_result_count = False
 
     filter_horizontal = ()
-    list_filter = (NovelLinkedListFilter, ChapterTitleListFilter)
+    list_filter = (
+        NovelLinkedListFilter,
+        ChapterTitleListFilter,
+        ChapterQUepubsListFilter,
+        "folder",
+    )
     fieldsets = ()
 
 
 class NovelAdmin(admin.ModelAdmin):
-    list_display = ("title", "wid", "original", "slug", "date_added")
-    search_fields = (
-        "title",
+    list_display = (
         "wid",
+        "title",
+        "original",
+        "date_added",
+    )
+    search_fields = (
+        "id",
+        "wid",
+        "title",
+        "dir_name",
     )
     readonly_fields = ()
 
@@ -80,7 +119,7 @@ class NovelAdmin(admin.ModelAdmin):
 
 
 class NovelQuAdmin(admin.ModelAdmin):
-    list_display = ("novel_title", "novel")
+    list_display = ("novel_title", "novel", "date_posted")
     search_fields = ("novel_title", "novel__title")
     readonly_fields = ()
 

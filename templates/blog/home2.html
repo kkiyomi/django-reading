@@ -16,30 +16,33 @@
         {% for row in novels %}
         <div class="row row-cols-2">
             {% for novel in row %}
-                {% if novel %}
-                <div class="card mb-3 page-item-detail border-0">
-                    <div class="row no-gutters">
-                        <div class="col-md-4">
-                            <a href="{% url 'novel_detail' novel.slug %}" title="{{novel.title}}">
-                                <img src="{{ novel.image.url }}" class="rounded float-left embed-responsive" >
-                            </a>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title item-title text-decoration-none">
-                                    <a href="{% url 'novel_detail' novel.slug %}">{{ novel.title }}</a>
-                                </h5>
-                                <p class="card-text">
-                                    {% for chapter in novel.chapterv2_set|ordereddesc|slice:"3" %}
-                                    <span><a class="mr-2" href="{% url 'novel_chapter' novel.slug chapter.number %}">Chapter {{ chapter.number }}</a></span>
-                                    <span class="date_format text-muted">{{ chapter.date_posted|naturaltime|shorten_naturaltime }}</span> <br>
-                                    {% endfor %}
-                                </p>
-                            </div>
+            {% if novel %}
+            <div class="card mb-3 page-item-detail border-0">
+                <div class="row no-gutters">
+                    <div class="col-md-4">
+                        <a href="{% url 'novel_detail' novel.slug %}" title="{{novel.title}}">
+                            <img src="{{ novel.image.url }}" class="rounded float-left embed-responsive">
+                        </a>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title item-title text-decoration-none">
+                                <a href="{% url 'novel_detail' novel.slug %}">{{ novel.title }}</a>
+                            </h5>
+                            <p class="card-text">
+                                {% for chapter in novel.chapterquepubs_set|ordereddesc|slice:"3" %}
+                                <span><a class="mr-2" href="{% url 'novel_chapter' novel.slug chapter.number %}">Chapter
+                                        {{ chapter.number }}</a></span>
+                                <span class="date_format text-muted">
+                                    {{ chapter.date_posted|naturaltime|shorten_naturaltime }}
+                                </span> <br>
+                                {% endfor %}
+                            </p>
                         </div>
                     </div>
                 </div>
-                {% endif %}
+            </div>
+            {% endif %}
             {% endfor %}
         </div>
         {% endfor %}
@@ -54,8 +57,11 @@
                 <span class="pagination-inner">
                     {% for num in page_obj.paginator.page_range %}
                     {% if num == page_obj.number %}
-                    <a class="pagination-active" href="#">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</a>
-                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a href="?page={{ num }}">{{ num }}</a>
+                    <a class="pagination-active" href="#">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages}}
+                    </a>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a
+                        href="?page={{ num }}">{{ num }}</a>
                         {% endif %}
                         {% endfor %}
                 </span>
@@ -68,6 +74,7 @@
             </div>
         </nav>
     </div>
-<!--     {% include "blog/sidebar.html" %}
- --></div>
+    <!--     {% include "blog/sidebar.html" %}
+ -->
+</div>
 {% endblock content %}

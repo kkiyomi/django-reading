@@ -44,16 +44,15 @@ class EpubDownloader:
 
         if "-" in chapter_number:
             start, end = chapter_number.split("-")
-            numbers = [str(item) for item in range(int(start), int(end))]
+            numbers = [str(item) for item in range(int(start), int(end) + 1)]
 
-            if (
-                ChapterQUepubs.objects.filter(
-                    novel_title=novel_title,
-                    number__in=numbers,
-                    folder="novel_quepubs/",
-                ).count()
-                == len(numbers)
-            ):
+            counts = ChapterQUepubs.objects.filter(
+                novel_title=novel_title,
+                number__in=numbers,
+                folder="novel_quepubs/",
+            ).count()
+
+            if counts == len(numbers):
                 return True
             else:
                 return False
@@ -68,12 +67,14 @@ class EpubDownloader:
             return False
 
     def download(self, data):
-        for item in data:
+        sorteddata = sorted(data, key=lambda k: k["fileSizeBytes"])
+        for item in sorteddata:
             novel_title, chapter_number = self.clean_data(item)
 
             if (
                 not self.downloaded(novel_title, chapter_number)
                 and item["fileName"] not in self.directory
+                and item["fileSizeBytes"] < 5 * 1000 * 1000
             ):
                 print(novel_title, chapter_number)
                 self.download_epub(item)

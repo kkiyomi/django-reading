@@ -123,7 +123,6 @@ class BookInfo:
         json_resp = json.loads(str(resp.text))
 
         bookName = json_resp["data"]["bookInfo"]["bookName"]
-        print(novel.id, bookName)
 
         if novel.description == "N/A":
             novel.description = json_resp["data"]["bookInfo"]["description"]
@@ -165,7 +164,6 @@ class BookInfo:
 
 
 if __name__ == "__main__":
-    novel = Novel.objects.get(wid="16732928106157405")
     bi = BookInfo()
     for novel in (
         Novel.objects.filter(description="N/A").exclude(wid="None").order_by("-id")

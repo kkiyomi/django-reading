@@ -45,10 +45,11 @@ def main():
         elapsed = time.perf_counter() - start
         time_allowed = time_limmit - elapsed
 
-        Utils(timed=time_allowed).fix_missing()
+        # Utils(timed=time_allowed).fix_missing()
+        Utils(timed=time_allowed).remove_duplicates(novel_list)
 
         elapsed = time.perf_counter() - start
-        msg = f"The task took {int(elapsed)} seconds..."
+        msg = f"\nThe task took {int(elapsed)} seconds..."
         print(msg)
 
         delay = time_limmit - elapsed

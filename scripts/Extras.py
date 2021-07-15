@@ -63,3 +63,22 @@ class Utils:
         )
         print("extras chapters", len(chapters))
         self.atomic_chunks(chapters, sqlfunction=self.link_novel_chapter)
+
+    def remove_dupli(self, item):
+
+        if ChapterQUepubs.objects.filter(
+            novel=item["novel"], number=item["number"], folder="novel_quepubs/"
+        ).exists():
+            ChapterQUepubs.objects.filter(id=item["id"]).delete()
+
+    def remove_duplicates(self, novel_list=None):
+        print("\nRemoving duplicates... ")
+
+        queryset = ChapterQUepubs.objects.exclude(folder="novel_quepubs/")
+
+        if novel_list is not None:
+            queryset = queryset.filter(novel_title__in=novel_list)
+
+        chapters = queryset.values("id", "novel", "number")
+
+        self.atomic_chunks(chapters, self.remove_dupli)

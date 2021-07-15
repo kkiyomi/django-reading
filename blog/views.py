@@ -322,7 +322,6 @@ class ChapterDetailView(DetailView):
             .order_by("-myinteger")
         )
 
-        print(context)
         context["querysets"] = queryset_qu
 
         context["content"] = treat_text(context["chapter"])

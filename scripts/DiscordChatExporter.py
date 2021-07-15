@@ -20,7 +20,7 @@ class DiscordChatExporter:
         self.chat_path = os.getcwd() + f"\\media\\discord\\discord.json"
 
     def load_token(self):
-        credentials = os.getcwd() + f"\\credentials.json"
+        credentials = os.getcwd() + f"\\scripts\\credentials.json"
         return self.loadfile_asjs(credentials)["token"]
 
     def loadfile_asjs(self, filename):
